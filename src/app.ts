@@ -1,4 +1,5 @@
 import Fastify, { type FastifyInstance } from 'fastify';
+import { productRoutes } from './products/product.routes.js';
 
 export class App {
   app: FastifyInstance;
@@ -10,7 +11,7 @@ export class App {
   }
 
   public async init(): Promise<void> {
-    // this.app.register(routes, { prefix: '/api' })
+    this.app.register(productRoutes, { prefix: '/api/products' })
 
     await this.app.listen({ port: this.port })
 
