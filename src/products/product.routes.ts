@@ -6,9 +6,9 @@ export async function productRoutes(app: FastifyInstance) {
   const service = new ProductService()
   const controller = new ProductController(service)
 
-  app.get('/', controller.findAll)
-  app.get('/:id', controller.findById)
-  app.post('/', controller.create)
-  app.put('/:id', controller.update)
-  app.delete('/:id', controller.delete)
+  app.get('/', controller.findAll.bind(controller))
+  app.get('/:id', controller.findById.bind(controller))
+  app.post('/', controller.create.bind(controller))
+  app.put('/:id', controller.update.bind(controller))
+  app.delete('/:id', controller.delete.bind(controller))
 }

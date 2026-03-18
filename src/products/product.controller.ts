@@ -4,7 +4,9 @@ import type { CreateProductDto } from './dto/create-product.dto.js';
 import type { UpdateProductDto } from './dto/update-product.dto.js';
 
 export class ProductController {
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService) {
+    this.productService = productService
+  }
 
   findAll(req: FastifyRequest, reply: FastifyReply) {
     return this.productService.findAll()
