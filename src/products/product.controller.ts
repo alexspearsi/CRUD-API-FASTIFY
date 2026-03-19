@@ -9,11 +9,19 @@ export class ProductController {
   }
 
   findAll(req: FastifyRequest, reply: FastifyReply) {
-    return this.productService.findAll()
+    const products = this.productService.findAll()
+
+    return reply.code(200).send(products)
   }
 
   findById(req: FastifyRequest<{ Params: { id: string }}>, reply: FastifyReply) {
-    return this.productService.findById(req.params.id)
+    const product = this.productService.findById(req.params.id)
+
+    if (!product) {
+      return reply.code(404).send({ message: "Product with this ID doesn't exist" })
+    }
+
+    return reply.code(200).send(product)
   }
 
   create(req: FastifyRequest<{ Body: CreateProductDto}>, reply: FastifyReply) {
