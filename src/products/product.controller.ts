@@ -25,14 +25,28 @@ export class ProductController {
   }
 
   create(req: FastifyRequest<{ Body: CreateProductDto}>, reply: FastifyReply) {
-    return this.productService.create(req.body)
+    const product = this.productService.create(req.body)
+
+    return reply.code(201).send(product)
   }
 
   update(req: FastifyRequest<{ Params: { id: string }, Body: UpdateProductDto}>, reply: FastifyReply) {
-    return this.productService.update(req.params.id, req.body)
+    const product = this.productService.update(req.params.id, req.body)
+
+    if (!product) {
+      return reply.code(404).send({ message: "Product with this ID doesn't exist"})
+    }
+
+    return reply.code(200).send(product)
   }
 
-  delete(req: FastifyRequest<{ Params: {id: string }}>) {
-    return this.productService.delete(req.params.id)
+  delete(req: FastifyRequest<{ Params: {id: string }}>, reply: FastifyReply) {
+    const isProductDeleted = this.productService.delete(req.params.id)
+
+    if (!isProductDeleted) {
+      return reply.code(404).send({ message: "Product with this ID doesn't exist"})
+    }
+
+    return reply.code(204).send()
   }
 }
