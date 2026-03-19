@@ -1,9 +1,9 @@
-import { App } from './app.js';
+import { App } from "./app.js";
 
 async function bootstrap() {
-  const app = new App()
+	const app = new App();
 
-  await app.init();
+	await app.init();
 }
 
-bootstrap()
+bootstrap();

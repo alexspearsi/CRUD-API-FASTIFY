@@ -1,34 +1,35 @@
 {
-  "name": "crud-api-on-fastify",
-  "version": "1.0.0",
-  "description": "",
-  "type": "module",
-  "main": "index.js",
-  "scripts": {
-    "start:dev": "cross-env NODE_ENV=development tsx watch src/main.ts",
-    "start:prod": "npm run build && cross-env NODE_ENV=production node dist/main.js",
-    "build": "tsc"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/alexspearsi/CRUD-API-ON-FASTIFY.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/alexspearsi/CRUD-API-ON-FASTIFY/issues"
-  },
-  "homepage": "https://github.com/alexspearsi/CRUD-API-ON-FASTIFY#readme",
-  "devDependencies": {
-    "@types/node": "^25.5.0",
-    "@types/uuid": "^10.0.0",
-    "cross-env": "^10.1.0",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "dotenv": "^17.3.1",
-    "fastify": "^5.8.2"
-  }
+	"name": "crud-api-on-fastify",
+	"version": "1.0.0",
+	"description": "",
+	"type": "module",
+	"main": "index.js",
+	"scripts": {
+		"start:dev": "cross-env NODE_ENV=development tsx watch src/main.ts",
+		"start:prod": "npm run build && cross-env NODE_ENV=production node dist/main.js",
+		"build": "tsc"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/alexspearsi/CRUD-API-ON-FASTIFY.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/alexspearsi/CRUD-API-ON-FASTIFY/issues"
+	},
+	"homepage": "https://github.com/alexspearsi/CRUD-API-ON-FASTIFY#readme",
+	"devDependencies": {
+		"@biomejs/biome": "2.4.8",
+		"@types/node": "^25.5.0",
+		"@types/uuid": "^10.0.0",
+		"cross-env": "^10.1.0",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"dotenv": "^17.3.1",
+		"fastify": "^5.8.2"
+	}
 }

@@ -1,64 +1,75 @@
-import Fastify, { type FastifyError, type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
-import { productRoutes } from './products/product.routes.js';
-import 'dotenv/config'
-import { LoggerService } from './logger/logger.service.js';
+import Fastify, {
+	type FastifyError,
+	type FastifyInstance,
+	type FastifyReply,
+	type FastifyRequest,
+} from "fastify";
+import { productRoutes } from "./products/product.routes.js";
+import "dotenv/config";
+import { LoggerService } from "./logger/logger.service.js";
 
 export class App {
-  app: FastifyInstance;
-  port: number;
-  env: string;
+	app: FastifyInstance;
+	port: number;
+	env: string;
 
-  constructor() {
-  this.app = Fastify({ logger: false })
-    this.port = Number(process.env.PORT) || 4000;
-    this.env = process.env.NODE_ENV || 'development';
-  }
+	constructor() {
+		this.app = Fastify({ logger: false });
+		this.port = Number(process.env.PORT) || 4000;
+		this.env = process.env.NODE_ENV || "development";
+	}
 
-  private logger = new LoggerService()
+	private logger = new LoggerService();
 
-  private setupNotFoundHandler() {
-    this.app.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
-      reply.code(404).send({
-        message: `Route ${request.method} ${request.url} not found`
-      })
-    })
-  }
+	private setupNotFoundHandler() {
+		this.app.setNotFoundHandler((req: FastifyRequest, reply: FastifyReply) => {
+			reply.code(404).send({
+				message: `Route ${req.method} ${req.url} not found`,
+			});
+		});
+	}
 
-  private setErrorHandler() {
-    this.app.setErrorHandler((error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
-      if ((error as any).validation) {
-        return reply.code(400).send({
-          message: error.message
-        })
-      }
+	private setErrorHandler() {
+		this.app.setErrorHandler(
+			(error: FastifyError, _req: FastifyRequest, reply: FastifyReply) => {
+				if ("validation" in error) {
+					return reply.code(400).send({
+						message: error.message,
+						details: error.validation,
+					});
+				}
 
-      reply.code(500).send({
-        message: 'Internal Server Error'
-      })
-    })
-  }
+				reply.code(500).send({
+					message: "Internal Server Error",
+				});
+			},
+		);
+	}
 
-  public async init(): Promise<void> {
-    this.app.addHook('onResponse', (req, reply, done) => {
-      const ms = Math.round(reply.elapsedTime)
-      const message = `[${req.id}] ${req.method} ${req.url} ${reply.statusCode} (${ms}ms)`
+	public async init(): Promise<void> {
+		this.app.addHook(
+			"onResponse",
+			async (req: FastifyRequest, reply: FastifyReply) => {
+				const ms = Math.round(reply.elapsedTime);
+				const message = `[${req.id}] ${req.method} ${req.url} ${reply.statusCode} (${ms}ms)`;
 
-      if (reply.statusCode >= 500) {
-        this.logger.error(message)
-      } else if (reply.statusCode >= 400) {
-        this.logger.warn(message)
-      } else {
-        this.logger.info(message)
-      }
-    })
+				if (reply.statusCode >= 500) {
+					this.logger.error(message);
+				} else if (reply.statusCode >= 400) {
+					this.logger.warn(message);
+				} else {
+					this.logger.info(message);
+				}
+			},
+		);
 
-    this.setupNotFoundHandler()
-    this.setErrorHandler()
+		this.setupNotFoundHandler();
+		this.setErrorHandler();
 
-    this.app.register(productRoutes, { prefix: '/api/products' })
+		this.app.register(productRoutes, { prefix: "/api/products" });
 
-    await this.app.listen({ port: this.port })
+		await this.app.listen({ port: this.port });
 
-    this.logger.info(`Сервер запущен на http://localhost:${this.port}`)
-  }
+		this.logger.info(`Сервер запущен на http://localhost:${this.port}`);
+	}
 }

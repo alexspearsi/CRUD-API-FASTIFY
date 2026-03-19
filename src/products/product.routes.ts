@@ -1,18 +1,19 @@
-import type { FastifyInstance, FastifySchema } from 'fastify';
-import { ProductService } from './products.service.js';
-import { ProductController } from './product.controller.js';
-import { idSchema, productSchema } from './product.schema.js';
-import { LoggerService } from '../logger/logger.service.js';
+import type { FastifyInstance } from "fastify";
+import { ProductController } from "./product.controller.js";
+import { idSchema, productSchema } from "./product.schema.js";
+import { ProductService } from "./products.service.js";
 
 export async function productRoutes(app: FastifyInstance) {
-  const logger = new LoggerService()
+	const service = new ProductService();
+	const controller = new ProductController(service);
 
-  const service = new ProductService()
-  const controller = new ProductController(service)
-
-  app.get('/', controller.findAll.bind(controller))
-  app.get('/:id', { schema: idSchema }, controller.findById.bind(controller))
-  app.post('/', { schema: productSchema }, controller.create.bind(controller))
-  app.put('/:id', { schema: { ...idSchema, ...productSchema } }, controller.update.bind(controller))
-  app.delete('/:id', { schema: idSchema }, controller.delete.bind(controller))
+	app.get("/", controller.findAll.bind(controller));
+	app.get("/:id", { schema: idSchema }, controller.findById.bind(controller));
+	app.post("/", { schema: productSchema }, controller.create.bind(controller));
+	app.put(
+		"/:id",
+		{ schema: { ...idSchema, ...productSchema } },
+		controller.update.bind(controller),
+	);
+	app.delete("/:id", { schema: idSchema }, controller.delete.bind(controller));
 }

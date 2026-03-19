@@ -1,3 +1,3 @@
-import type { CreateProductDto } from './create-product.dto.js';
+import type { CreateProductDto } from "./create-product.dto.js";
 
-export type UpdateProductDto = Partial<CreateProductDto>
+export type UpdateProductDto = Partial<CreateProductDto>;
