@@ -1,13 +1,16 @@
 import Fastify, { type FastifyError, type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import { productRoutes } from './products/product.routes.js';
+import 'dotenv/config'
 
 export class App {
   app: FastifyInstance;
   port: number;
+  env: string;
 
   constructor() {
     this.app = Fastify()
-    this.port = 8000;
+    this.port = Number(process.env.PORT) || 8000;
+    this.env = process.env.NODE_ENV || 'development';
   }
 
   private setupNotFoundHandler() {
@@ -34,6 +37,6 @@ export class App {
 
     await this.app.listen({ port: this.port })
 
-    console.log(`Server running at port:${this.port}`);
+    console.log(`Server running in ${this.env} at http://localhost:${this.port}`);
   }
 }
