@@ -2,8 +2,11 @@ import type { FastifyInstance, FastifySchema } from 'fastify';
 import { ProductService } from './products.service.js';
 import { ProductController } from './product.controller.js';
 import { idSchema, productSchema } from './product.schema.js';
+import { LoggerService } from '../logger/logger.service.js';
 
 export async function productRoutes(app: FastifyInstance) {
+  const logger = new LoggerService()
+
   const service = new ProductService()
   const controller = new ProductController(service)
 

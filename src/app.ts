@@ -1,6 +1,7 @@
 import Fastify, { type FastifyError, type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import { productRoutes } from './products/product.routes.js';
 import 'dotenv/config'
+import { LoggerService } from './logger/logger.service.js';
 
 export class App {
   app: FastifyInstance;
@@ -8,10 +9,12 @@ export class App {
   env: string;
 
   constructor() {
-    this.app = Fastify()
-    this.port = Number(process.env.PORT) || 8000;
+  this.app = Fastify({ logger: false })
+    this.port = Number(process.env.PORT) || 4000;
     this.env = process.env.NODE_ENV || 'development';
   }
+
+  private logger = new LoggerService()
 
   private setupNotFoundHandler() {
     this.app.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
@@ -23,6 +26,12 @@ export class App {
 
   private setErrorHandler() {
     this.app.setErrorHandler((error: FastifyError, request: FastifyRequest, reply: FastifyReply) => {
+      if ((error as any).validation) {
+        return reply.code(400).send({
+          message: error.message
+        })
+      }
+
       reply.code(500).send({
         message: 'Internal Server Error'
       })
@@ -30,6 +39,19 @@ export class App {
   }
 
   public async init(): Promise<void> {
+    this.app.addHook('onResponse', (req, reply, done) => {
+      const ms = Math.round(reply.elapsedTime)
+      const message = `[${req.id}] ${req.method} ${req.url} ${reply.statusCode} (${ms}ms)`
+
+      if (reply.statusCode >= 500) {
+        this.logger.error(message)
+      } else if (reply.statusCode >= 400) {
+        this.logger.warn(message)
+      } else {
+        this.logger.info(message)
+      }
+    })
+
     this.setupNotFoundHandler()
     this.setErrorHandler()
 
@@ -37,6 +59,6 @@ export class App {
 
     await this.app.listen({ port: this.port })
 
-    console.log(`Server running in ${this.env} at http://localhost:${this.port}`);
+    this.logger.info(`Сервер запущен на http://localhost:${this.port}`)
   }
 }

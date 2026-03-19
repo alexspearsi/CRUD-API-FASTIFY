@@ -2,9 +2,12 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { ProductService } from './products.service.js';
 import type { CreateProductDto } from './dto/create-product.dto.js';
 import type { UpdateProductDto } from './dto/update-product.dto.js';
+import type { LoggerService } from '../logger/logger.service.js';
 
 export class ProductController {
-  constructor(private productService: ProductService) {
+  constructor(
+    private productService: ProductService,
+  ) {
     this.productService = productService
   }
 

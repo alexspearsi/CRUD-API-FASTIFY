@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto'
 import type { CreateProductDto } from './dto/create-product.dto.js'
 import type { UpdateProductDto } from './dto/update-product.dto.js'
 import type { Product } from './interfaces/product.interface.js';
+import type { LoggerService } from '../logger/logger.service.js';
 import { products } from '../database/product.store.js';
 
 export class ProductService {
