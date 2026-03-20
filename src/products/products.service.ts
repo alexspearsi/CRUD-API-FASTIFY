@@ -1,8 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { products } from "../database/product.store.js";
-import type { CreateProductDto } from "./dto/create-product.dto.js";
-import type { UpdateProductDto } from "./dto/update-product.dto.js";
 import type { Product } from "./interfaces/product.interface.js";
+import type { ProductDto } from './dto/product.dto.js';
 
 export class ProductService {
 	private products = products;
@@ -15,7 +14,7 @@ export class ProductService {
 		return this.products.find((product) => product.id === id);
 	}
 
-	create(data: CreateProductDto): Product {
+	create(data: ProductDto): Product {
 		const product: Product = {
 			id: randomUUID(),
 			...data,
@@ -26,7 +25,7 @@ export class ProductService {
 		return product;
 	}
 
-	update(id: string, data: UpdateProductDto): Product | null {
+	update(id: string, data: ProductDto): Product | null {
 		const product = this.findById(id);
 
 		if (!product) {

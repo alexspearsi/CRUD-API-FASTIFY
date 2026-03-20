@@ -1,3 +1,4 @@
+import "dotenv/config";
 import Fastify, {
 	type FastifyError,
 	type FastifyInstance,
@@ -5,8 +6,9 @@ import Fastify, {
 	type FastifyRequest,
 } from "fastify";
 import { productRoutes } from "./products/product.routes.js";
-import "dotenv/config";
 import { LoggerService } from "./logger/logger.service.js";
+import swagger from '@fastify/swagger';
+import swaggerUI from '@fastify/swagger-ui';
 
 export class App {
 	app: FastifyInstance;
@@ -30,43 +32,51 @@ export class App {
 	}
 
 	private setErrorHandler() {
-		this.app.setErrorHandler(
-			(error: FastifyError, _req: FastifyRequest, reply: FastifyReply) => {
-				if ("validation" in error) {
-					return reply.code(400).send({
-						message: error.message,
-						details: error.validation,
-					});
-				}
-
-				reply.code(500).send({
-					message: "Internal Server Error",
+		this.app.setErrorHandler((error: FastifyError, _req: FastifyRequest, reply: FastifyReply) => {
+			if ("validation" in error) {
+				return reply.code(400).send({
+					message: error.message,
+					details: error.validation,
 				});
-			},
-		);
+			}
+
+			reply.code(500).send({
+				message: "Internal Server Error",
+			});
+		});
 	}
 
 	public async init(): Promise<void> {
-		this.app.addHook(
-			"onResponse",
-			async (req: FastifyRequest, reply: FastifyReply) => {
-				const ms = Math.round(reply.elapsedTime);
-				const message = `[${req.id}] ${req.method} ${req.url} ${reply.statusCode} (${ms}ms)`;
-
-				if (reply.statusCode >= 500) {
-					this.logger.error(message);
-				} else if (reply.statusCode >= 400) {
-					this.logger.warn(message);
-				} else {
-					this.logger.info(message);
+		await this.app.register(swagger, {
+			openapi: {
+				info: {
+					title: "CRUD API ON FASTIFY",
+					version: "1.0.0"
 				}
-			},
-		);
+			}
+		});
+
+		await this.app.register(swaggerUI, {
+			routePrefix: "/docs"
+		})
+
+		this.app.addHook("onResponse", async (req: FastifyRequest, reply: FastifyReply) => {
+			const ms = Math.round(reply.elapsedTime);
+			const message = `[${req.id}] ${req.method} ${req.url} ${reply.statusCode} (${ms}ms)`;
+
+			if (reply.statusCode >= 500) {
+				this.logger.error(message);
+			} else if (reply.statusCode >= 400) {
+				this.logger.warn(message);
+			} else {
+				this.logger.info(message);
+			}
+		});
+
+		this.app.register(productRoutes, { prefix: "/api/products" });
 
 		this.setupNotFoundHandler();
 		this.setErrorHandler();
-
-		this.app.register(productRoutes, { prefix: "/api/products" });
 
 		await this.app.listen({ port: this.port });
 

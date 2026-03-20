@@ -13,20 +13,14 @@ export class LoggerService {
 	};
 
 	info(message: string) {
-		console.log(
-			`${this.gettime()} ${this.colors.blue}INFO${this.colors.reset}: ${message}`,
-		);
+		console.log(`${this.gettime()} ${this.colors.blue}INFO${this.colors.reset}: ${message}`);
 	}
 
 	warn(message: string) {
-		console.log(
-			`${this.gettime()} ${this.colors.orange}WARN${this.colors.reset}: ${message}`,
-		);
+		console.log(`${this.gettime()} ${this.colors.orange}WARN${this.colors.reset}: ${message}`);
 	}
 
 	error(message: string) {
-		console.error(
-			`${this.gettime()} ${this.colors.red}ERROR${this.colors.reset}: ${message}`,
-		);
+		console.error(`${this.gettime()} ${this.colors.red}ERROR${this.colors.reset}: ${message}`);
 	}
 }
