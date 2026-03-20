@@ -1,14 +1,14 @@
 import "dotenv/config";
+import swagger from "@fastify/swagger";
+import swaggerUI from "@fastify/swagger-ui";
 import Fastify, {
 	type FastifyError,
 	type FastifyInstance,
 	type FastifyReply,
 	type FastifyRequest,
 } from "fastify";
-import { productRoutes } from "./products/product.routes.js";
 import { LoggerService } from "./logger/logger.service.js";
-import swagger from '@fastify/swagger';
-import swaggerUI from '@fastify/swagger-ui';
+import { productRoutes } from "./products/product.routes.js";
 
 export class App {
 	app: FastifyInstance;
@@ -16,7 +16,14 @@ export class App {
 	env: string;
 
 	constructor() {
-		this.app = Fastify({ logger: false });
+		this.app = Fastify({
+			logger: false,
+			ajv: {
+				customOptions: {
+					strict: false,
+				},
+			},
+		});
 		this.port = Number(process.env.PORT) || 4000;
 		this.env = process.env.NODE_ENV || "development";
 	}
@@ -51,18 +58,18 @@ export class App {
 			openapi: {
 				info: {
 					title: "CRUD API ON FASTIFY",
-					version: "1.0.0"
-				}
-			}
+					version: "1.0.0",
+				},
+			},
 		});
 
 		await this.app.register(swaggerUI, {
-			routePrefix: "/docs"
-		})
+			routePrefix: "/docs",
+		});
 
 		this.app.addHook("onResponse", async (req: FastifyRequest, reply: FastifyReply) => {
 			const ms = Math.round(reply.elapsedTime);
-			const message = `[${req.id}] ${req.method} ${req.url} ${reply.statusCode} (${ms}ms)`;
+			const message = `${req.method} ${req.url} ${reply.statusCode} (${ms}ms)`;
 
 			if (reply.statusCode >= 500) {
 				this.logger.error(message);

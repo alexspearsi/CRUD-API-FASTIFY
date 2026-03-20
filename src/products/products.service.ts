@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { products } from "../database/product.store.js";
+import type { ProductDto } from "./dto/product.dto.js";
 import type { Product } from "./interfaces/product.interface.js";
-import type { ProductDto } from './dto/product.dto.js';
 
 export class ProductService {
 	private products = products;
 
-	findAll() {
+	findAll(): Product[] {
 		return this.products;
 	}
 

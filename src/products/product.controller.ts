@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
+import type { ProductDto } from "./dto/product.dto.js";
 import type { ProductService } from "./products.service.js";
-import type { ProductDto } from './dto/product.dto.js';
 
 export class ProductController {
 	constructor(private productService: ProductService) {
@@ -29,10 +29,7 @@ export class ProductController {
 		return reply.code(201).send(product);
 	}
 
-	update(
-		req: FastifyRequest<{ Params: { id: string }; Body: ProductDto }>,
-		reply: FastifyReply,
-	) {
+	update(req: FastifyRequest<{ Params: { id: string }; Body: ProductDto }>, reply: FastifyReply) {
 		const product = this.productService.update(req.params.id, req.body);
 
 		if (!product) {

@@ -1,6 +1,12 @@
 import type { FastifyInstance } from "fastify";
 import { ProductController } from "./product.controller.js";
-import { idSchema, notFoundSchema, productResponseSchema, productSchema, validationErrorSchema } from "./product.schema.js";
+import {
+	idSchema,
+	notFoundSchema,
+	productResponseSchema,
+	productSchema,
+	validationErrorSchema,
+} from "./product.schema.js";
 import { ProductService } from "./products.service.js";
 
 export async function productRoutes(app: FastifyInstance) {
@@ -14,15 +20,19 @@ export async function productRoutes(app: FastifyInstance) {
 				tags: ["Products"],
 				description: "Get all products",
 				response: {
-					200: { type: "array", items: productResponseSchema }
-				}
-			}
+					200: {
+						type: "array",
+						items: productResponseSchema,
+					},
+				},
+			},
 		},
-		controller.findAll.bind(controller));
+		controller.findAll.bind(controller),
+	);
 
 	app.get(
-		"/:id", 
-		{ 
+		"/:id",
+		{
 			schema: {
 				...idSchema,
 				tags: ["Products"],
@@ -30,47 +40,49 @@ export async function productRoutes(app: FastifyInstance) {
 				response: {
 					200: productResponseSchema,
 					400: validationErrorSchema,
-					404: notFoundSchema
-				}
-			}
-		 }, 
-		controller.findById.bind(controller));
+					404: notFoundSchema,
+				},
+			},
+		},
+		controller.findById.bind(controller),
+	);
 
 	app.post(
-		"/", 
-		{ 
+		"/",
+		{
 			schema: {
 				...productSchema,
 				tags: ["Products"],
 				description: "Create product",
 				response: {
 					201: productResponseSchema,
-					400: validationErrorSchema
-				}
-			}
+					400: validationErrorSchema,
+				},
+			},
 		},
-		controller.create.bind(controller)
+		controller.create.bind(controller),
 	);
 
 	app.put(
 		"/:id",
-		{ 
-			schema: { 
-				...idSchema, 
+		{
+			schema: {
+				...idSchema,
 				...productSchema,
 				tags: ["Products"],
 				description: "Update product",
 				response: {
 					200: productResponseSchema,
 					400: validationErrorSchema,
-					404: notFoundSchema
-				}
-			} },
+					404: notFoundSchema,
+				},
+			},
+		},
 		controller.update.bind(controller),
 	);
 	app.delete(
-		"/:id", 
-		{ 
+		"/:id",
+		{
 			schema: {
 				...idSchema,
 				tags: ["Products"],
@@ -78,9 +90,10 @@ export async function productRoutes(app: FastifyInstance) {
 				response: {
 					204: { type: "null" },
 					400: validationErrorSchema,
-					404: notFoundSchema
-				}
-			} 
-		}, 
-		controller.delete.bind(controller));
+					404: notFoundSchema,
+				},
+			},
+		},
+		controller.delete.bind(controller),
+	);
 }
