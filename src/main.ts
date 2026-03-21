@@ -1,7 +1,8 @@
 import { App } from "./app.js";
+import { MemoryStorageService } from './database/memory-storage.service.js';
 
 async function bootstrap() {
-	const app = new App();
+	const app = new App(new MemoryStorageService());
 
 	await app.init();
 

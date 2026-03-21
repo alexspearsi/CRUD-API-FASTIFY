@@ -19,7 +19,7 @@ export class App {
 	port: number;
 	env: string;
 
-	constructor(private readonly storageService: IStorageService) {
+	constructor(private readonly storageService: IStorageService = new MemoryStorageService()) {
 		this.storageService = storageService;
 
 		this.app = Fastify({
