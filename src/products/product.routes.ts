@@ -6,7 +6,7 @@ import {
 	productResponseSchema,
 	productSchema,
 	validationErrorSchema,
-} from "./product.schema.js";
+} from "./schema/product.schema.js";
 import { ProductService } from "./products.service.js";
 
 export async function productRoutes(app: FastifyInstance) {

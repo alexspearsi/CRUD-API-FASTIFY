@@ -10,6 +10,8 @@ import Fastify, {
 import { LoggerService } from "./logger/logger.service.js";
 import { productRoutes } from "./products/product.routes.js";
 
+const API_PREFIX = "/api";
+
 export class App {
 	app: FastifyInstance;
 	port: number;
@@ -54,6 +56,8 @@ export class App {
 	}
 
 	public async init(): Promise<void> {
+
+		
 		await this.app.register(swagger, {
 			openapi: {
 				info: {
@@ -68,6 +72,10 @@ export class App {
 		});
 
 		this.app.addHook("onResponse", async (req: FastifyRequest, reply: FastifyReply) => {
+			if (!req.url.startsWith(API_PREFIX)) {
+				return ;
+			}
+
 			const ms = Math.round(reply.elapsedTime);
 			const message = `${req.method} ${req.url} ${reply.statusCode} (${ms}ms)`;
 
@@ -85,8 +93,13 @@ export class App {
 		this.setupNotFoundHandler();
 		this.setErrorHandler();
 
-		await this.app.listen({ port: this.port });
+		if (process.env.NODE_ENV !== "test") {
+			await this.app.listen({ port: this.port });
+			
+			this.logger.info(`Сервер запущен на http://localhost:${this.port}`);
+		} else {
+			await this.app.ready()
+		}
 
-		this.logger.info(`Сервер запущен на http://localhost:${this.port}`);
 	}
 }

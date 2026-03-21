@@ -10,7 +10,10 @@
 		"build": "tsc",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write",
-		"test": "vitest"
+		"test": "cross-env NODE_ENV=test vitest",
+		"test:e2e": "cross-env NODE_ENV=test vitest run test/e2e",
+		"test:coverage": "cross-env NODE_ENV=test vitest run --coverage"
+
 	},
 	"repository": {
 		"type": "git",
@@ -25,11 +28,10 @@
 	"homepage": "https://github.com/alexspearsi/CRUD-API-ON-FASTIFY#readme",
 	"devDependencies": {
 		"@biomejs/biome": "2.4.8",
-		"@types/jest": "^30.0.0",
 		"@types/node": "^25.5.0",
+		"@vitest/coverage-v8": "^4.1.0",
+		"@vitest/ui": "^4.1.0",
 		"cross-env": "^10.1.0",
-		"jest": "^30.3.0",
-		"ts-jest": "^29.4.6",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"vitest": "^4.1.0"
