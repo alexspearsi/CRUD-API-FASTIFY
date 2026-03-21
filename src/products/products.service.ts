@@ -1,53 +1,64 @@
 import { randomUUID } from "node:crypto";
-import { products } from "../database/product.store.js";
+import type { IStorageService } from "../database/storage.interface.js";
 import type { ProductDto } from "./dto/product.dto.js";
 import type { Product } from "./interfaces/product.interface.js";
 
 export class ProductService {
-	private products = products;
+	constructor(private readonly storageService: IStorageService) {}
 
-	findAll(): Product[] {
-		return this.products;
+	async findAll(): Promise<Product[]> {
+		return this.storageService.readDB();
 	}
 
-	findById(id: string): Product | undefined {
-		return this.products.find((product) => product.id === id);
+	async findById(id: string): Promise<Product | undefined> {
+		const products = await this.storageService.readDB();
+
+		return products.find((product) => product.id === id);
 	}
 
-	create(data: ProductDto): Product {
+	async create(data: ProductDto): Promise<Product> {
+		const products = await this.storageService.readDB();
+
 		const product: Product = {
 			id: randomUUID(),
 			...data,
 		};
 
-		this.products.push(product);
+		products.push(product);
+
+		await this.storageService.writeDB(products);
 
 		return product;
 	}
 
-	update(id: string, data: ProductDto): Product | null {
-		const product = this.findById(id);
+	async update(id: string, data: ProductDto): Promise<Product | null> {
+		const products = await this.storageService.readDB();
+
+		const product = products.find((product) => product.id === id);
 
 		if (!product) {
 			return null;
 		}
 
-		Object.assign(product, {
-			id: product.id,
-			...data,
-		});
+		Object.assign(product, data);
+
+		await this.storageService.writeDB(products);
 
 		return product;
 	}
 
-	delete(id: string): boolean {
-		const index = this.products.findIndex((p) => p.id === id);
+	async delete(id: string): Promise<boolean> {
+		const products = await this.storageService.readDB();
+
+		const index = products.findIndex((p) => p.id === id);
 
 		if (index === -1) {
 			return false;
 		}
 
-		this.products.splice(index, 1);
+		products.splice(index, 1);
+
+		await this.storageService.writeDB(products);
 
 		return true;
 	}

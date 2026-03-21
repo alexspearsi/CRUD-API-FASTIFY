@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "../../src/app.js";
-import { products } from "../../src/database/product.store.js";
+import { MemoryStorageService } from "../../src/database/memory-storage.service.js";
 import type { Product } from "../../src/products/interfaces/product.interface.js";
 
 const PRODUCT_DTO: Omit<Product, "id"> = {
@@ -24,9 +24,9 @@ describe("E2E: Products API", () => {
 
 	beforeEach(async () => {
 		vi.spyOn(console, "log").mockImplementation(() => {});
-		products.length = 0;
+		const storageService = new MemoryStorageService();
 
-		app = new App();
+		app = new App(storageService);
 		await app.init();
 	});
 
@@ -160,7 +160,9 @@ describe("E2E: Products API", () => {
 			});
 
 			expect(res.statusCode).toBe(204);
-			expect(products).toEqual([]);
+
+			const list = await app.app.inject({ method: "GET", url: "/api/products" });
+			expect(list.json()).toEqual([]);
 		});
 
 		it("should return 400 if productId is invalid (not uuid)", async () => {

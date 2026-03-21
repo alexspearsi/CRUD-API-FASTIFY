@@ -1,4 +1,6 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { MemoryStorageService } from "../database/memory-storage.service.js";
+import type { IStorageService } from "../database/storage.interface.js";
 import { ProductController } from "./product.controller.js";
 import { ProductService } from "./products.service.js";
 import {
@@ -9,8 +11,13 @@ import {
 	validationErrorSchema,
 } from "./schema/product.schema.js";
 
-export async function productRoutes(app: FastifyInstance) {
-	const service = new ProductService();
+export async function productRoutes(
+	app: FastifyInstance,
+	options: FastifyPluginOptions & { storageService?: IStorageService },
+) {
+	const storage = options.storageService ?? new MemoryStorageService();
+
+	const service = new ProductService(storage);
 	const controller = new ProductController(service);
 
 	app.get(

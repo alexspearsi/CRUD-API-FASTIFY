@@ -7,6 +7,8 @@ import Fastify, {
 	type FastifyReply,
 	type FastifyRequest,
 } from "fastify";
+import { MemoryStorageService } from "./database/memory-storage.service.js";
+import type { IStorageService } from "./database/storage.interface.js";
 import { LoggerService } from "./logger/logger.service.js";
 import { productRoutes } from "./products/product.routes.js";
 
@@ -17,7 +19,9 @@ export class App {
 	port: number;
 	env: string;
 
-	constructor() {
+	constructor(private readonly storageService: IStorageService) {
+		this.storageService = storageService;
+
 		this.app = Fastify({
 			logger: false,
 			ajv: {
@@ -55,7 +59,9 @@ export class App {
 		});
 	}
 
-	public async init(): Promise<void> {
+	public async init(port?: number): Promise<void> {
+		const listenPort = port ?? this.port;
+
 		await this.app.register(swagger, {
 			openapi: {
 				info: {
@@ -75,7 +81,7 @@ export class App {
 			}
 
 			const ms = Math.round(reply.elapsedTime);
-			const message = `${req.method} ${req.url} ${reply.statusCode} (${ms}ms)`;
+			const message = `[port ${listenPort}] ${req.method} ${req.url} ${reply.statusCode} (${ms}ms)`;
 
 			if (reply.statusCode >= 500) {
 				this.logger.error(message);
@@ -86,13 +92,16 @@ export class App {
 			}
 		});
 
-		this.app.register(productRoutes, { prefix: "/api/products" });
+		this.app.register(productRoutes, {
+			prefix: "/api/products",
+			storageService: this.storageService,
+		});
 
 		this.setupNotFoundHandler();
 		this.setErrorHandler();
 
 		if (process.env.NODE_ENV !== "test") {
-			await this.app.listen({ port: this.port });
+			await this.app.listen({ port: listenPort });
 
 			this.logger.info(`Сервер запущен на http://localhost:${this.port}`);
 		} else {

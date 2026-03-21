@@ -1,11 +1,12 @@
 import { validate } from "uuid";
 import { beforeEach, describe, expect, it } from "vitest";
-import { products } from "../../src/database/product.store.js";
+import { MemoryStorageService } from "../../src/database/memory-storage.service.js";
+import type { Product } from "../../src/products/interfaces/product.interface.js";
 import { ProductService } from "../../src/products/products.service.js";
 
 const UPDATED_PRICE = 199;
 
-const PRODUCT_DTO = {
+const PRODUCT_DTO: Omit<Product, "id"> = {
 	name: "New Product",
 	description: "Something very cool!",
 	price: 1099,
@@ -22,37 +23,43 @@ const UPDATED_PRODUCT_DTO = {
 };
 
 describe("Product Service", () => {
-	let service: ProductService;
+	let productService: ProductService;
+	let storageService: MemoryStorageService;
 
 	beforeEach(() => {
-		products.length = 0;
-		service = new ProductService();
+		storageService = new MemoryStorageService();
+		productService = new ProductService(storageService);
 	});
 
-	it("should return empty array", () => {
+	it("should return empty array", async () => {
+		const products = await productService.findAll();
+
 		expect(products).toHaveLength(0);
 	});
 
-	it("should create a new product", () => {
-		const product = service.create(PRODUCT_DTO);
+	it("should create a new product", async () => {
+		const product = await productService.create(PRODUCT_DTO);
+		const products = await productService.findAll();
 
 		expect(product).toMatchObject(PRODUCT_DTO);
 		expect(validate(product.id)).toBe(true);
-		expect(products).toContainEqual(product);
+		expect(products).toHaveLength(1);
 	});
 
-	it("should find product by id", () => {
-		const product = service.create(PRODUCT_DTO);
+	it("should find product by id", async () => {
+		const product = await productService.create(PRODUCT_DTO);
 
-		const found = service.findById(product.id);
+		const found = await productService.findById(product.id);
 
 		expect(found).toEqual(product);
 	});
 
-	it("should update product", () => {
-		const product = service.create(PRODUCT_DTO);
+	it("should update product", async () => {
+		const product = await productService.create(PRODUCT_DTO);
 
-		const updated = service.update(product.id, UPDATED_PRODUCT_DTO);
+		const updated = await productService.update(product.id, UPDATED_PRODUCT_DTO);
+
+		expect(updated).not.toBeNull();
 
 		if (updated) {
 			expect(updated.id).toBe(product.id);
@@ -62,20 +69,21 @@ describe("Product Service", () => {
 		}
 	});
 
-	it("should delete product", () => {
-		const product = service.create(PRODUCT_DTO);
+	it("should delete product", async () => {
+		const product = await productService.create(PRODUCT_DTO);
 
-		service.delete(product.id);
+		await productService.delete(product.id);
 
+		const products = await productService.findAll();
 		expect(products).toHaveLength(0);
 	});
 
-	it("should return undefined for deleted product", () => {
-		const product = service.create(PRODUCT_DTO);
+	it("should return undefined for deleted product", async () => {
+		const product = await productService.create(PRODUCT_DTO);
 
-		service.delete(product.id);
+		await productService.delete(product.id);
 
-		const result = service.findById(product.id);
+		const result = await productService.findById(product.id);
 
 		expect(result).toBeUndefined();
 	});
