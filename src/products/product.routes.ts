@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { ProductController } from "./product.controller.js";
+import { ProductService } from "./products.service.js";
 import {
 	idSchema,
 	notFoundSchema,
@@ -7,7 +8,6 @@ import {
 	productSchema,
 	validationErrorSchema,
 } from "./schema/product.schema.js";
-import { ProductService } from "./products.service.js";
 
 export async function productRoutes(app: FastifyInstance) {
 	const service = new ProductService();

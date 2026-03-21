@@ -56,8 +56,6 @@ export class App {
 	}
 
 	public async init(): Promise<void> {
-
-		
 		await this.app.register(swagger, {
 			openapi: {
 				info: {
@@ -73,7 +71,7 @@ export class App {
 
 		this.app.addHook("onResponse", async (req: FastifyRequest, reply: FastifyReply) => {
 			if (!req.url.startsWith(API_PREFIX)) {
-				return ;
+				return;
 			}
 
 			const ms = Math.round(reply.elapsedTime);
@@ -95,11 +93,10 @@ export class App {
 
 		if (process.env.NODE_ENV !== "test") {
 			await this.app.listen({ port: this.port });
-			
+
 			this.logger.info(`Сервер запущен на http://localhost:${this.port}`);
 		} else {
-			await this.app.ready()
+			await this.app.ready();
 		}
-
 	}
 }
