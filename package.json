@@ -1,0 +1,47 @@
+{
+	"name": "crud-api-on-fastify",
+	"version": "1.0.0",
+	"description": "",
+	"type": "module",
+	"main": "index.js",
+	"scripts": {
+		"start:dev": "cross-env NODE_ENV=development tsx watch src/main.ts",
+		"start:prod": "npm run build && cross-env NODE_ENV=production node dist/main.js",
+		"start:multi": "cross-env NODE_ENV=development tsx src/cluster.ts",
+		"build": "tsc",
+		"lint": "biome check .",
+		"lint:fix": "biome check . --write",
+		"test": "cross-env NODE_ENV=test vitest",
+		"test:unit": "cross-env NODE_ENV=test vitest run test/unit --watch",
+		"test:int": "cross-env NODE_ENV=test vitest run test/integration",
+		"test:coverage": "cross-env NODE_ENV=test vitest run --coverage"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/alexspearsi/CRUD-API-ON-FASTIFY.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/alexspearsi/CRUD-API-ON-FASTIFY/issues"
+	},
+	"homepage": "https://github.com/alexspearsi/CRUD-API-ON-FASTIFY#readme",
+	"devDependencies": {
+		"@biomejs/biome": "2.4.8",
+		"@types/node": "^25.5.0",
+		"@vitest/coverage-v8": "^4.1.0",
+		"@vitest/ui": "^4.1.0",
+		"cross-env": "^10.1.0",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3",
+		"vitest": "^4.1.0"
+	},
+	"dependencies": {
+		"@fastify/swagger": "^9.7.0",
+		"@fastify/swagger-ui": "^5.2.5",
+		"dotenv": "^17.3.1",
+		"fastify": "^5.8.2",
+		"uuid": "^13.0.0"
+	}
+}
