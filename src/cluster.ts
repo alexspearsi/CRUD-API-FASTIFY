@@ -8,14 +8,9 @@ const PORT = Number(process.env.PORT) || 4000;
 const WORKERS_COUNT = os.availableParallelism() - 1;
 
 interface IpcMessage {
-	id: string;
+	id: number;
 	type: string;
 	payload?: unknown;
-}
-
-interface IpcResponse {
-	id: string;
-	result: unknown;
 }
 
 if (cluster.isPrimary) {
@@ -33,22 +28,51 @@ if (cluster.isPrimary) {
 			let result: unknown;
 
 			switch (msg.type) {
-				case "READ_ALL":
+				case "FIND_ALL": {
 					result = [...db];
 					break;
-				case "WRITE_ALL":
-					db.length = 0;
-					db.push(...(msg.payload as Product[]));
-					result = null;
+				}
+
+				case "FIND_BY_ID": {
+					result = db.find((product) => product.id === msg.payload);
 					break;
-				default:
-					result = null;
+				}
+
+				case "CREATE": {
+					db.push(msg.payload as Product);
+					result = msg.payload;
+					break;
+				}
+
+				case "UPDATE": {
+					const { id, data } = msg.payload as { id: string; data: Omit<Product, "id"> };
+					const product = db.find((product) => product.id === id);
+
+					if (product) {
+						Object.assign(product, data);
+					}
+
+					result = product ?? null;
+
+					break;
+				}
+
+				case "DELETE": {
+					const index = db.findIndex((product) => product.id === msg.payload);
+
+					if (index !== -1) {
+						db.splice(index, 1);
+					}
+
+					result = index !== -1;
+					break;
+				}
 			}
 
-			worker.send({ id: msg.id, result } satisfies IpcResponse);
+			worker.send({ id: msg.id, result });
 		});
 
-		worker.on("exit", (code, signal) => {
+		worker.on("exit", () => {
 			console.log(`Worker ${workerPort} died, Restarting...`);
 			cluster.fork({ PORT: String(workerPort) });
 		});
