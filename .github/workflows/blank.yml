@@ -19,5 +19,5 @@ jobs:
 
       - run: npm install
       - run: npm run lint
-      - run: npm run test:unit
-      - run: npm run test:e2e
+      - run: npx vitest run test/unit
+      - run: npm run test:int
